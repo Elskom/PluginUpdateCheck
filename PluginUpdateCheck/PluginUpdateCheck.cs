@@ -22,6 +22,13 @@ namespace Elskom.Generic.Libs
         private bool disposedValue = false;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="PluginUpdateCheck"/> class.
+        /// </summary>
+        public PluginUpdateCheck()
+        {
+        }
+
+        /// <summary>
         /// Gets or sets the notification icon to use in all instances of this class.
         /// </summary>
         public static NotifyIcon NotifyIcon { get; set; } = null;
@@ -32,13 +39,6 @@ namespace Elskom.Generic.Libs
         public static string[] PluginUrls { get; private protected set; }
 
         internal static WebClient WebClient { get; private protected set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PluginUpdateCheck"/> class.
-        /// </summary>
-        public PluginUpdateCheck()
-        {
-        }
 
         /// <summary>
         /// Gets if there is any pending updates and displays a message.
@@ -260,10 +260,7 @@ namespace Elskom.Generic.Libs
             return false;
         }
 
-        /// <summary>
-        /// internal dispose method. Do not use.
-        /// </summary>
-        protected virtual void Dispose(bool disposing)
+        private protected virtual void Dispose(bool disposing)
         {
             if (!this.disposedValue)
             {

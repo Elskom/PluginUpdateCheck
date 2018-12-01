@@ -36,7 +36,7 @@ namespace Elskom.Generic.Libs
         /// <summary>
         /// Gets the plugin urls used in all instances.
         /// </summary>
-        public static string[] PluginUrls { get; private protected set; }
+        public static List<string> PluginUrls { get; private protected set; }
 
         internal static WebClient WebClient { get; private protected set; }
 
@@ -104,7 +104,7 @@ namespace Elskom.Generic.Libs
 
             if (PluginUrls == null)
             {
-                PluginUrls = new List<string>().ToArray();
+                PluginUrls = new List<string>();
             }
 
             foreach (var pluginURL in pluginURLs)
@@ -163,7 +163,7 @@ namespace Elskom.Generic.Libs
                 }
 
                 // append the string to the cache.
-                PluginUrls = PluginUrls.Append(pluginURL).ToArray();
+                PluginUrls = PluginUrls.Append(pluginURL).ToList();
             }
 
             return pluginUpdateChecks;

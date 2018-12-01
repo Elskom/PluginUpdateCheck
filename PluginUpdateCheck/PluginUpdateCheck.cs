@@ -19,6 +19,8 @@ namespace Elskom.Generic.Libs
     /// </summary>
     public class PluginUpdateCheck : IDisposable
     {
+        private bool disposedValue = false;
+
         /// <summary>
         /// Gets or sets the notification icon to use in all instances of this class.
         /// </summary>
@@ -31,11 +33,9 @@ namespace Elskom.Generic.Libs
 
         internal static WebClient WebClient { get; private protected set; }
 
-        private bool disposedValue = false;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginUpdateCheck"/> class.
-        ///</summary>
+        /// </summary>
         public PluginUpdateCheck()
         {
         }
@@ -78,15 +78,11 @@ namespace Elskom.Generic.Libs
         public string[] DownloadFiles { get; private protected set; }
 
         /// <summary>
-        /// Cleans up the resources used by <see cref="PluginUpdateCheck"/>.
-        /// </summary>
-        public void Dispose() => this.Dispose(true);
-
-        /// <summary>
         /// Checks for plugin updates from the provided plugin source urls.
         /// </summary>
         /// <param name="pluginURLs">The repository urls to the plugins.</param>
         /// <param name="pluginTypes">A list of types to the plugins to check for updates to.</param>
+        /// <returns>A list of <see cref="PluginUpdateCheck"/> instances representing the plugins that needs updating or are to be installed.</returns>
         // catches the plugin urls and uses that cache to detect added urls, and only appends those to the list.
         public static List<PluginUpdateCheck> CheckForUpdates(string[] pluginURLs, List<Type> pluginTypes)
         {
@@ -174,8 +170,14 @@ namespace Elskom.Generic.Libs
         }
 
         /// <summary>
+        /// Cleans up the resources used by <see cref="PluginUpdateCheck"/>.
+        /// </summary>
+        public void Dispose() => this.Dispose(true);
+
+        /// <summary>
         /// Installs the files to the plugin pointed to by this instance.
         /// </summary>
+        /// <param name="saveToZip">A bool indicating if the file should be installed to a zip file instead of a folder.</param>
         /// <returns>A bool indicating if anything changed.</returns>
         public bool Install(bool saveToZip)
         {
@@ -220,6 +222,7 @@ namespace Elskom.Generic.Libs
         /// <summary>
         /// Uninstalls the files to the plugin pointed to by this instance.
         /// </summary>
+        /// <param name="saveToZip">A bool indicating if the file should be uninstalled from a zip file instead of a folder. If the zip file after the operation becomes empty it is also deleted automatically.</param>
         /// <returns>A bool indicating if anything changed.</returns>
         public bool Uninstall(bool saveToZip)
         {
@@ -257,6 +260,9 @@ namespace Elskom.Generic.Libs
             return false;
         }
 
+        /// <summary>
+        /// internal dispose method. Do not use.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (!this.disposedValue)

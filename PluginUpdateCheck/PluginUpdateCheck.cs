@@ -11,6 +11,7 @@ namespace Elskom.Generic.Libs
     using System.IO.Compression;
     using System.Linq;
     using System.Net;
+    using System.Windows.Forms;
     using System.Xml.Linq;
 
     /// <summary>

@@ -11,7 +11,6 @@ namespace Elskom.Generic.Libs
     using System.IO.Compression;
     using System.Linq;
     using System.Net;
-    using System.Windows.Forms;
     using System.Xml.Linq;
 
     /// <summary>
@@ -29,11 +28,6 @@ namespace Elskom.Generic.Libs
         }
 
         /// <summary>
-        /// Gets or sets the notification icon to use in all instances of this class.
-        /// </summary>
-        public static NotifyIcon NotifyIcon { get; set; } = null;
-
-        /// <summary>
         /// Gets the plugin urls used in all instances.
         /// </summary>
         public static List<string> PluginUrls { get; private protected set; }
@@ -46,7 +40,6 @@ namespace Elskom.Generic.Libs
                 ? MessageManager.ShowInfo(
                     $"Update {this.CurrentVersion} for plugin {this.PluginName} is availible.",
                     "New plugin update.",
-                    NotifyIcon,
                     Convert.ToBoolean(Convert.ToInt32(SettingsFile.Settingsxml?.TryRead("UseNotifications") != string.Empty ? SettingsFile.Settingsxml?.TryRead("UseNotifications") : "0")))
                 : DialogResult.OK;
 
@@ -157,7 +150,6 @@ namespace Elskom.Generic.Libs
                         MessageManager.ShowError(
                             $"Failed to download the plugins sources list.{Environment.NewLine}Reason: {ex.Message}",
                             "Error!",
-                            NotifyIcon,
                             Convert.ToBoolean(Convert.ToInt32(SettingsFile.Settingsxml?.TryRead("UseNotifications") != string.Empty ? SettingsFile.Settingsxml?.TryRead("UseNotifications") : "0")));
                     }
                 }
@@ -211,7 +203,6 @@ namespace Elskom.Generic.Libs
                     MessageManager.ShowError(
                         $"Failed to install the selected plugin.{Environment.NewLine}Reason: {ex.Message}",
                         "Error!",
-                        NotifyIcon,
                         Convert.ToBoolean(Convert.ToInt32(SettingsFile.Settingsxml?.TryRead("UseNotifications") != string.Empty ? SettingsFile.Settingsxml?.TryRead("UseNotifications") : "0")));
                 }
             }

@@ -86,8 +86,9 @@ namespace Elskom.Generic.Libs
         /// Checks for plugin updates from the provided plugin source urls.
         /// </summary>
         /// <param name="pluginURLs">The repository urls to the plugins.</param>
+        /// <param name="pluginTypes">A list of types to the plugins to check for updates to.</param>
         // catches the plugin urls and uses that cache to detect added urls, and only appends those to the list.
-        public static List<PluginUpdateCheck> CheckForUpdates(string[] pluginURLs)
+        public static List<PluginUpdateCheck> CheckForUpdates(string[] pluginURLs, List<Type> pluginTypes)
         {
             var pluginUpdateChecks = new List<PluginUpdateCheck>();
 
@@ -123,12 +124,12 @@ namespace Elskom.Generic.Libs
                             var currentVersion = element.Attribute("Version").Value;
                             var pluginName = element.Attribute("Name").Value;
                             var found = false;
-                            foreach (var callbackplugin in ExecutionManager.Callbackplugins)
+                            foreach (var pluginType in pluginTypes)
                             {
-                                if (pluginName.Equals(callbackplugin.GetType().Namespace))
+                                if (pluginName.Equals(pluginType.Namespace))
                                 {
                                     found = true;
-                                    var installedVersion = callbackplugin.GetType().Assembly.GetName().Version.ToString();
+                                    var installedVersion = pluginType.Assembly.GetName().Version.ToString();
                                     var pluginUpdateCheck = new PluginUpdateCheck
                                     {
                                         CurrentVersion = currentVersion,
@@ -141,25 +142,6 @@ namespace Elskom.Generic.Libs
                                 }
                             }
 
-                            foreach (var komplugin in KOMManager.Komplugins)
-                            {
-                                if (pluginName.Equals(komplugin.GetType().Namespace))
-                                {
-                                    found = true;
-                                    var installedVersion = komplugin.GetType().Assembly.GetName().Version.ToString();
-                                    var pluginUpdateCheck = new PluginUpdateCheck
-                                    {
-                                        CurrentVersion = currentVersion,
-                                        InstalledVersion = installedVersion,
-                                        PluginName = pluginName,
-                                        DownloadUrl = $"{element.Attribute("DownloadUrl").Value}/{currentVersion}/",
-                                        DownloadFiles = element.Descendants("DownloadFile").Select(y => y.Attribute("Name").Value).ToArray(),
-                                    };
-                                    pluginUpdateChecks.Add(pluginUpdateCheck);
-                                }
-                            }
-
-                            // list these as well so the plugin updater form works.
                             if (!found)
                             {
                                 var pluginUpdateCheck = new PluginUpdateCheck

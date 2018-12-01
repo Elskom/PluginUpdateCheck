@@ -1,2 +1,2 @@
 # PluginUpdateCheck
-A c# generic MessageBox manager.
+A c# generic plugin update checker.

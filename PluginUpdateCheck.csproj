@@ -12,7 +12,7 @@
 		<PackageProjectUrl>https://github.com/Elskom/PluginUpdateCheck/</PackageProjectUrl>
 		<PackageLicenseUrl>https://github.com/Elskom/PluginUpdateCheck/blob/master/LICENSE</PackageLicenseUrl>
 		<Copyright>Copyright (c) 2018</Copyright>
-		<Description></Description>
+		<Description>A c# generic plugin update checker.</Description>
 		<PackageReleaseNotes>Initial release.</PackageReleaseNotes>
 		<Version>1.0.0</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>

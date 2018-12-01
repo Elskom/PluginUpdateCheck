@@ -53,6 +53,9 @@
 		<PackageReference Include="MessageManager">
 											    <Version>1.0.1</Version>
 		</PackageReference>
+		<PackageReference Include="SettingsFile">
+            <Version>1.0.1</Version>
+        </PackageReference>
 		<Reference Include="System.IO.Compression" />
         <Reference Include="System.IO.Compression.FileSystem" />
         <Reference Include="System.Xml" />

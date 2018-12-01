@@ -19,17 +19,6 @@ namespace Elskom.Generic.Libs
     /// </summary>
     public class PluginUpdateCheck : IDisposable
     {
-        private bool disposedValue = false;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PluginUpdateCheck"/> class.
-        ///</summary>
-        public PluginUpdateCheck()
-        {
-        }
-
-        internal static WebClient WebClient { get; private protected set; }
-
         /// <summary>
         /// Gets or sets the notification icon to use in all instances of this class.
         /// </summary>
@@ -39,6 +28,17 @@ namespace Elskom.Generic.Libs
         /// Gets the plugin urls used in all instances.
         /// </summary>
         public static string[] PluginUrls { get; private protected set; }
+
+        internal static WebClient WebClient { get; private protected set; }
+
+        private bool disposedValue = false;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PluginUpdateCheck"/> class.
+        ///</summary>
+        public PluginUpdateCheck()
+        {
+        }
 
         /// <summary>
         /// Gets if there is any pending updates and displays a message.
@@ -53,14 +53,17 @@ namespace Elskom.Generic.Libs
                 : DialogResult.OK;
 
         /// <summary>
+        /// Gets the plugin name this instance is pointing to.
         /// </summary>
         public string PluginName { get; private protected set; }
 
         /// <summary>
+        /// Gets the current version of the plugin that is pointed to by this instance.
         /// </summary>
         public string CurrentVersion { get; private protected set; }
 
         /// <summary>
+        /// Gets the installed version of the plugin that is pointed to by this instance.
         /// </summary>
         public string InstalledVersion { get; private protected set; }
 

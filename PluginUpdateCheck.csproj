@@ -58,7 +58,6 @@
         </PackageReference>
         <Reference Include="System.IO.Compression" />
         <Reference Include="System.IO.Compression.FileSystem" />
-        <Reference Include="System.Linq" />
         <Reference Include="System.Xml" />
         <Reference Include="System.Xml.Linq" />
         <Reference Include="System.Windows.Forms" />

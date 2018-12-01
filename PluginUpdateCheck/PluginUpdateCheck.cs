@@ -9,7 +9,6 @@ namespace Elskom.Generic.Libs
     using System.Collections.Generic;
     using System.IO;
     using System.IO.Compression;
-    using System.Linq;
     using System.Net;
     using System.Windows.Forms;
     using System.Xml.Linq;
@@ -163,7 +162,7 @@ namespace Elskom.Generic.Libs
                 }
 
                 // append the string to the cache.
-                PluginUrls = PluginUrls.Append(pluginURL).ToList();
+                PluginUrls.Add(pluginURL);
             }
 
             return pluginUpdateChecks;

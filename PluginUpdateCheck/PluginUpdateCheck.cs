@@ -38,8 +38,6 @@ namespace Elskom.Generic.Libs
         /// </summary>
         public static List<string> PluginUrls { get; private protected set; }
 
-        internal static WebClient WebClient { get; private protected set; }
-
         /// <summary>
         /// Gets if there is any pending updates and displays a message.
         /// </summary>
@@ -76,6 +74,8 @@ namespace Elskom.Generic.Libs
         /// Gets the files to the plugin to download.
         /// </summary>
         public string[] DownloadFiles { get; private protected set; }
+
+        internal static WebClient WebClient { get; private protected set; }
 
         /// <summary>
         /// Checks for plugin updates from the provided plugin source urls.

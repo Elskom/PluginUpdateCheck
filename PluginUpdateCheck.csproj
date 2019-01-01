@@ -11,7 +11,7 @@
 		<RepositoryUrl>https://github.com/Elskom/PluginUpdateCheck/</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/Elskom/PluginUpdateCheck/</PackageProjectUrl>
 		<PackageLicenseUrl>https://github.com/Elskom/PluginUpdateCheck/blob/master/LICENSE</PackageLicenseUrl>
-		<Copyright>Copyright (c) 2018</Copyright>
+		<Copyright>Copyright (c) 2018-2019</Copyright>
 		<Description>A c# generic plugin update checker.</Description>
 		<PackageReleaseNotes>Added .NET Core 3.0 to target frameworks.</PackageReleaseNotes>
 		<Version>1.0.2</Version>

@@ -29,6 +29,14 @@ namespace Elskom.Generic.Libs
         }
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="PluginUpdateCheck"/> class.
+        /// </summary>
+        ~PluginUpdateCheck()
+        {
+            this.Dispose(false);
+        }
+
+        /// <summary>
         /// Gets the plugin urls used in all instances.
         /// </summary>
         public static List<string> PluginUrls { get; private protected set; }
@@ -62,12 +70,12 @@ namespace Elskom.Generic.Libs
         /// <summary>
         /// Gets the url to download the files to the plugin from.
         /// </summary>
-        public string DownloadUrl { get; private protected set; }
+        public Uri DownloadUrl { get; private protected set; }
 
         /// <summary>
         /// Gets the files to the plugin to download.
         /// </summary>
-        public string[] DownloadFiles { get; private protected set; }
+        public List<string> DownloadFiles { get; private protected set; }
 
         internal static WebClient WebClient { get; private protected set; }
 
@@ -125,8 +133,8 @@ namespace Elskom.Generic.Libs
                                         CurrentVersion = currentVersion,
                                         InstalledVersion = installedVersion,
                                         PluginName = pluginName,
-                                        DownloadUrl = $"{element.Attribute("DownloadUrl").Value}/{currentVersion}/",
-                                        DownloadFiles = element.Descendants("DownloadFile").Select(y => y.Attribute("Name").Value).ToArray(),
+                                        DownloadUrl = new Uri($"{element.Attribute("DownloadUrl").Value}/{currentVersion}/"),
+                                        DownloadFiles = element.Descendants("DownloadFile").Select(y => y.Attribute("Name").Value).ToList(),
                                     };
                                     pluginUpdateChecks.Add(pluginUpdateCheck);
                                 }
@@ -139,8 +147,8 @@ namespace Elskom.Generic.Libs
                                     CurrentVersion = currentVersion,
                                     InstalledVersion = string.Empty,
                                     PluginName = pluginName,
-                                    DownloadUrl = $"{element.Attribute("DownloadUrl").Value}/{currentVersion}/",
-                                    DownloadFiles = element.Descendants("DownloadFile").Select(y => y.Attribute("Name").Value).ToArray(),
+                                    DownloadUrl = new Uri($"{element.Attribute("DownloadUrl").Value}/{currentVersion}/"),
+                                    DownloadFiles = element.Descendants("DownloadFile").Select(y => y.Attribute("Name").Value).ToList(),
                                 };
                                 pluginUpdateChecks.Add(pluginUpdateCheck);
                             }
@@ -165,7 +173,11 @@ namespace Elskom.Generic.Libs
         /// <summary>
         /// Cleans up the resources used by <see cref="PluginUpdateCheck"/>.
         /// </summary>
-        public void Dispose() => this.Dispose(true);
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         /// <summary>
         /// Installs the files to the plugin pointed to by this instance.
@@ -258,7 +270,7 @@ namespace Elskom.Generic.Libs
             {
                 if (disposing)
                 {
-                    if (WebClient != null)
+                    if (WebClient != null && Environment.HasShutdownStarted)
                     {
                         WebClient.Dispose();
                         WebClient = null;

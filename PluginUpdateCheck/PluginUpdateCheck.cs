@@ -195,18 +195,19 @@ namespace Elskom.Generic.Libs
                     if (saveToZip)
                     {
                         var zippath = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}plugins.zip";
-                        var zipFile = ZipFile.Open(zippath, ZipArchiveMode.Update);
-                        foreach (var entry in zipFile.Entries)
+                        using (var zipFile = ZipFile.Open(zippath, ZipArchiveMode.Update))
                         {
-                            if (entry.FullName.Equals(downloadFile))
+                            foreach (var entry in zipFile.Entries)
                             {
-                                entry.Delete();
+                                if (entry.FullName.Equals(downloadFile))
+                                {
+                                    entry.Delete();
+                                }
                             }
-                        }
 
-                        zipFile.CreateEntryFromFile(path, downloadFile);
-                        File.Delete(path);
-                        zipFile.Dispose();
+                            zipFile.CreateEntryFromFile(path, downloadFile);
+                            File.Delete(path);
+                        }
                     }
 
                     return true;
@@ -241,20 +242,21 @@ namespace Elskom.Generic.Libs
                 if (saveToZip)
                 {
                     var zippath = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}plugins.zip";
-                    var zipFile = ZipFile.Open(zippath, ZipArchiveMode.Update);
-                    foreach (var entry in zipFile.Entries)
+                    using (var zipFile = ZipFile.Open(zippath, ZipArchiveMode.Update))
                     {
-                        if (entry.FullName.Equals(downloadFile))
+                        foreach (var entry in zipFile.Entries)
                         {
-                            entry.Delete();
+                            if (entry.FullName.Equals(downloadFile))
+                            {
+                                entry.Delete();
+                            }
                         }
-                    }
 
-                    var entries = zipFile.Entries.Count;
-                    zipFile.Dispose();
-                    if (entries == 0)
-                    {
-                        File.Delete(zippath);
+                        var entries = zipFile.Entries.Count;
+                        if (entries == 0)
+                        {
+                            File.Delete(zippath);
+                        }
                     }
                 }
 

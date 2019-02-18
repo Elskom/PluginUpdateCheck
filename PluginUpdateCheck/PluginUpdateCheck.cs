@@ -11,7 +11,6 @@ namespace Elskom.Generic.Libs
     using System.IO.Compression;
     using System.Linq;
     using System.Net;
-    using System.Windows.Forms;
     using System.Xml.Linq;
 
     /// <summary>
@@ -37,20 +36,31 @@ namespace Elskom.Generic.Libs
         }
 
         /// <summary>
+        /// Event that fires when a new message should show up.
+        /// </summary>
+        public static event EventHandler<MessageEventArgs> MessageEvent;
+
+        /// <summary>
         /// Gets the plugin urls used in all instances.
         /// </summary>
         public static List<string> PluginUrls { get; private protected set; }
 
         /// <summary>
-        /// Gets if there is any pending updates and displays a message.
+        /// Gets a value indicating whether there are any pending updates and displays a message if there is.
         /// </summary>
-        public DialogResult ShowMessage
-            => !this.InstalledVersion.Equals(this.CurrentVersion) && !string.IsNullOrEmpty(this.InstalledVersion)
-                ? MessageManager.ShowInfo(
-                    $"Update {this.CurrentVersion} for plugin {this.PluginName} is availible.",
-                    "New plugin update.",
-                    Convert.ToBoolean(Convert.ToInt32(SettingsFile.Settingsxml?.TryRead("UseNotifications") != string.Empty ? SettingsFile.Settingsxml?.TryRead("UseNotifications") : "0")))
-                : DialogResult.OK;
+        public bool ShowMessage
+        {
+            get
+            {
+                if (!this.InstalledVersion.Equals(this.CurrentVersion) && !string.IsNullOrEmpty(this.InstalledVersion))
+                {
+                    MessageEvent?.Invoke(this, new MessageEventArgs($"Update {this.CurrentVersion} for plugin {this.PluginName} is availible.", "New plugin update."));
+                    return true;
+                }
+
+                return false;
+            }
+        }
 
         /// <summary>
         /// Gets the plugin name this instance is pointing to.
@@ -156,10 +166,7 @@ namespace Elskom.Generic.Libs
                     }
                     catch (WebException ex)
                     {
-                        MessageManager.ShowError(
-                            $"Failed to download the plugins sources list.{Environment.NewLine}Reason: {ex.Message}",
-                            "Error!",
-                            Convert.ToBoolean(Convert.ToInt32(SettingsFile.Settingsxml?.TryRead("UseNotifications") != string.Empty ? SettingsFile.Settingsxml?.TryRead("UseNotifications") : "0")));
+                        MessageEvent?.Invoke(typeof(PluginUpdateCheck), new MessageEventArgs($"Failed to download the plugins sources list.{Environment.NewLine}Reason: {ex.Message}", "Error!"));
                     }
                 }
 
@@ -214,10 +221,7 @@ namespace Elskom.Generic.Libs
                 }
                 catch (WebException ex)
                 {
-                    MessageManager.ShowError(
-                        $"Failed to install the selected plugin.{Environment.NewLine}Reason: {ex.Message}",
-                        "Error!",
-                        Convert.ToBoolean(Convert.ToInt32(SettingsFile.Settingsxml?.TryRead("UseNotifications") != string.Empty ? SettingsFile.Settingsxml?.TryRead("UseNotifications") : "0")));
+                    MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to install the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!"));
                 }
             }
 
@@ -231,36 +235,43 @@ namespace Elskom.Generic.Libs
         /// <returns>A bool indicating if anything changed.</returns>
         public bool Uninstall(bool saveToZip)
         {
-            foreach (var downloadFile in this.DownloadFiles)
+            try
             {
-                var path = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}plugins{Path.DirectorySeparatorChar}{downloadFile}";
-                if (File.Exists(path))
+                foreach (var downloadFile in this.DownloadFiles)
                 {
-                    File.Delete(path);
-                }
-
-                if (saveToZip)
-                {
-                    var zippath = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}plugins.zip";
-                    using (var zipFile = ZipFile.Open(zippath, ZipArchiveMode.Update))
+                    var path = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}plugins{Path.DirectorySeparatorChar}{downloadFile}";
+                    if (File.Exists(path))
                     {
-                        foreach (var entry in zipFile.Entries)
+                        File.Delete(path);
+                    }
+
+                    if (saveToZip)
+                    {
+                        var zippath = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}plugins.zip";
+                        using (var zipFile = ZipFile.Open(zippath, ZipArchiveMode.Update))
                         {
-                            if (entry.FullName.Equals(downloadFile))
+                            foreach (var entry in zipFile.Entries)
                             {
-                                entry.Delete();
+                                if (entry.FullName.Equals(downloadFile))
+                                {
+                                    entry.Delete();
+                                }
+                            }
+
+                            var entries = zipFile.Entries.Count;
+                            if (entries == 0)
+                            {
+                                File.Delete(zippath);
                             }
                         }
-
-                        var entries = zipFile.Entries.Count;
-                        if (entries == 0)
-                        {
-                            File.Delete(zippath);
-                        }
                     }
-                }
 
-                return true;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to uninstall the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!"));
             }
 
             return false;

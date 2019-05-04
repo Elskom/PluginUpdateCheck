@@ -10,6 +10,7 @@ namespace Elskom.Generic.Libs
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
+    using System.Messaging;
     using System.Net;
     using System.Xml.Linq;
 
@@ -54,7 +55,7 @@ namespace Elskom.Generic.Libs
             {
                 if (!this.InstalledVersion.Equals(this.CurrentVersion) && !string.IsNullOrEmpty(this.InstalledVersion))
                 {
-                    MessageEvent?.Invoke(this, new MessageEventArgs($"Update {this.CurrentVersion} for plugin {this.PluginName} is availible.", "New plugin update."));
+                    MessageEvent?.Invoke(this, new MessageEventArgs($"Update {this.CurrentVersion} for plugin {this.PluginName} is availible.", "New plugin update.", ErrorLevel.Info));
                     return true;
                 }
 
@@ -98,6 +99,16 @@ namespace Elskom.Generic.Libs
         // catches the plugin urls and uses that cache to detect added urls, and only appends those to the list.
         public static List<PluginUpdateCheck> CheckForUpdates(string[] pluginURLs, List<Type> pluginTypes)
         {
+            if (pluginURLs == null)
+            {
+                throw new ArgumentNullException(nameof(pluginURLs));
+            }
+
+            if (pluginTypes == null)
+            {
+                throw new ArgumentNullException(nameof(pluginTypes));
+            }
+
             var pluginUpdateChecks = new List<PluginUpdateCheck>();
 
             // fixup the github urls (if needed).
@@ -166,7 +177,7 @@ namespace Elskom.Generic.Libs
                     }
                     catch (WebException ex)
                     {
-                        MessageEvent?.Invoke(typeof(PluginUpdateCheck), new MessageEventArgs($"Failed to download the plugins sources list.{Environment.NewLine}Reason: {ex.Message}", "Error!"));
+                        MessageEvent?.Invoke(typeof(PluginUpdateCheck), new MessageEventArgs($"Failed to download the plugins sources list.{Environment.NewLine}Reason: {ex.Message}", "Error!", ErrorLevel.Error));
                     }
                 }
 
@@ -212,7 +223,7 @@ namespace Elskom.Generic.Libs
                                 }
                             }
 
-                            zipFile.CreateEntryFromFile(path, downloadFile);
+                            _ = zipFile.CreateEntryFromFile(path, downloadFile);
                             File.Delete(path);
                         }
                     }
@@ -221,7 +232,7 @@ namespace Elskom.Generic.Libs
                 }
                 catch (WebException ex)
                 {
-                    MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to install the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!"));
+                    MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to install the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!", ErrorLevel.Error));
                 }
             }
 
@@ -269,10 +280,12 @@ namespace Elskom.Generic.Libs
                     return true;
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
-                MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to uninstall the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!"));
+                MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to uninstall the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!", ErrorLevel.Error));
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             return false;
         }

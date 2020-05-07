@@ -13,28 +13,20 @@ namespace Elskom.Generic.Libs
     using System.Messaging;
     using System.Net;
     using System.Xml.Linq;
+    using global::PluginUpdateCheck.Properties;
 
     /// <summary>
     /// A generic plugin update checker.
     /// </summary>
     public class PluginUpdateCheck : IDisposable
     {
-        private bool disposedValue = false;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PluginUpdateCheck"/> class.
-        /// </summary>
-        public PluginUpdateCheck()
-        {
-        }
+        private bool disposedValue;
 
         /// <summary>
         /// Finalizes an instance of the <see cref="PluginUpdateCheck"/> class.
         /// </summary>
         ~PluginUpdateCheck()
-        {
-            this.Dispose(false);
-        }
+            => this.Dispose(false);
 
         /// <summary>
         /// Event that fires when a new message should show up.
@@ -53,9 +45,9 @@ namespace Elskom.Generic.Libs
         {
             get
             {
-                if (!this.InstalledVersion.Equals(this.CurrentVersion) && !string.IsNullOrEmpty(this.InstalledVersion))
+                if (!string.Equals(this.InstalledVersion, this.CurrentVersion, StringComparison.Ordinal) && !string.IsNullOrEmpty(this.InstalledVersion))
                 {
-                    MessageEvent?.Invoke(this, new MessageEventArgs($"Update {this.CurrentVersion} for plugin {this.PluginName} is availible.", "New plugin update.", ErrorLevel.Info));
+                    MessageEvent?.Invoke(this, new MessageEventArgs(string.Format(Resources.PluginUpdateCheck_ShowMessage_Update_for_plugin_is_availible, this.CurrentVersion, this.PluginName), Resources.PluginUpdateCheck_ShowMessage_New_plugin_update, ErrorLevel.Info));
                     return true;
                 }
 
@@ -99,16 +91,8 @@ namespace Elskom.Generic.Libs
         // catches the plugin urls and uses that cache to detect added urls, and only appends those to the list.
         public static List<PluginUpdateCheck> CheckForUpdates(string[] pluginURLs, List<Type> pluginTypes)
         {
-            if (pluginURLs == null)
-            {
-                throw new ArgumentNullException(nameof(pluginURLs));
-            }
-
-            if (pluginTypes == null)
-            {
-                throw new ArgumentNullException(nameof(pluginTypes));
-            }
-
+            _ = pluginURLs ?? throw new ArgumentNullException(nameof(pluginURLs));
+            _ = pluginTypes ?? throw new ArgumentNullException(nameof(pluginTypes));
             var pluginUpdateChecks = new List<PluginUpdateCheck>();
 
             // fixup the github urls (if needed).
@@ -117,19 +101,11 @@ namespace Elskom.Generic.Libs
                 pluginURLs[i] = pluginURLs[i].Replace(
                     "https://github.com/",
                     "https://raw.githubusercontent.com/") + (
-                    pluginURLs[i].EndsWith("/") ? "master/plugins.xml" : "/master/plugins.xml");
+                    pluginURLs[i].EndsWith("/", StringComparison.Ordinal) ? "master/plugins.xml" : "/master/plugins.xml");
             }
 
-            if (WebClient == null)
-            {
-                WebClient = new WebClient();
-            }
-
-            if (PluginUrls == null)
-            {
-                PluginUrls = new List<string>();
-            }
-
+            WebClient ??= new WebClient();
+            PluginUrls ??= new List<string>();
             foreach (var pluginURL in pluginURLs)
             {
                 if (!PluginUrls.Contains(pluginURL))
@@ -145,7 +121,7 @@ namespace Elskom.Generic.Libs
                             var found = false;
                             foreach (var pluginType in pluginTypes)
                             {
-                                if (pluginName.Equals(pluginType.Namespace))
+                                if (pluginName.Equals(pluginType.Namespace, StringComparison.Ordinal))
                                 {
                                     found = true;
                                     var installedVersion = pluginType.Assembly.GetName().Version.ToString();
@@ -177,7 +153,7 @@ namespace Elskom.Generic.Libs
                     }
                     catch (WebException ex)
                     {
-                        MessageEvent?.Invoke(typeof(PluginUpdateCheck), new MessageEventArgs($"Failed to download the plugins sources list.{Environment.NewLine}Reason: {ex.Message}", "Error!", ErrorLevel.Error));
+                        MessageEvent?.Invoke(typeof(PluginUpdateCheck), new MessageEventArgs(string.Format(Resources.PluginUpdateCheck_CheckForUpdates_Failed_to_download_the_plugins_sources_list_Reason, Environment.NewLine, ex.Message), Resources.PluginUpdateCheck_CheckForUpdates_Error, ErrorLevel.Error));
                     }
                 }
 
@@ -217,7 +193,7 @@ namespace Elskom.Generic.Libs
                         {
                             foreach (var entry in zipFile.Entries)
                             {
-                                if (entry.FullName.Equals(downloadFile))
+                                if (entry.FullName.Equals(downloadFile, StringComparison.Ordinal))
                                 {
                                     entry.Delete();
                                 }
@@ -232,7 +208,7 @@ namespace Elskom.Generic.Libs
                 }
                 catch (WebException ex)
                 {
-                    MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to install the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!", ErrorLevel.Error));
+                    MessageEvent?.Invoke(this, new MessageEventArgs(string.Format(Resources.PluginUpdateCheck_Install_Failed_to_install_the_selected_plugin_Reason, Environment.NewLine, ex.Message), Resources.PluginUpdateCheck_CheckForUpdates_Error, ErrorLevel.Error));
                 }
             }
 
@@ -263,7 +239,7 @@ namespace Elskom.Generic.Libs
                         {
                             foreach (var entry in zipFile.Entries)
                             {
-                                if (entry.FullName.Equals(downloadFile))
+                                if (entry.FullName.Equals(downloadFile, StringComparison.Ordinal))
                                 {
                                     entry.Delete();
                                 }
@@ -283,7 +259,7 @@ namespace Elskom.Generic.Libs
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
-                MessageEvent?.Invoke(this, new MessageEventArgs($"Failed to uninstall the selected plugin.{Environment.NewLine}Reason: {ex.Message}", "Error!", ErrorLevel.Error));
+                MessageEvent?.Invoke(this, new MessageEventArgs(string.Format(Resources.PluginUpdateCheck_Uninstall_Failed_to_uninstall_the_selected_plugin_Reason, Environment.NewLine, ex.Message), Resources.PluginUpdateCheck_CheckForUpdates_Error, ErrorLevel.Error));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

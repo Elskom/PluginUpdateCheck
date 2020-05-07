@@ -13,7 +13,7 @@ namespace Elskom.Generic.Libs
     using System.Messaging;
     using System.Net;
     using System.Xml.Linq;
-    using global::PluginUpdateCheck.Properties;
+    using Elskom.Generic.Libs.Properties;
 
     /// <summary>
     /// A generic plugin update checker.

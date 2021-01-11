@@ -6,3 +6,5 @@
 ![Build Status](https://github.com/Elskom/PluginUpdateCheck/workflows/.NET%20Core%20%28build20pull%20request%29/badge.svg)
 
 A c# generic plugin update checker.
+
+MOVED TO https://github.com/Elskom/Sdk/
